@@ -2,6 +2,7 @@ import type { MetaFunction, LoaderFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
 import React, { useState, useEffect } from 'react';
+import lodash from 'lodash';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 dayjs.extend(relativeTime);
@@ -76,6 +77,37 @@ export default function Index() {
   const [error, setError] = useState('');
 
   let data = useLoaderData<IndexData>();
+
+  // 一番下に到達したら handleClick()でページを更新
+  const handleScroll = lodash.throttle(() => {
+    if (
+      window.innerHeight + document.documentElement.scrollTop !==
+      document.documentElement.offsetHeight
+    ) {
+      return;
+    }
+
+    // 一番下に到達した時の処理
+    //if(message !== "loading...") {
+      setPage((prevCount) => prevCount + 1);
+    //}
+
+  }, 500);
+
+  useEffect(() => {
+    window.addEventListener('scroll', handleScroll);
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // pageが変化した時に実行
+  useEffect(() => {
+    //document.title = `page = ${page}, message = ${message}`;
+    handleClick();
+    // eslint-disable-next-line
+  }, [page]); // Only re-run the effect if count changes
 
   // tagが変化した時に実行
   useEffect(() => {
