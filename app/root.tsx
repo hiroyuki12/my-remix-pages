@@ -21,7 +21,8 @@ export let links: LinksFunction = () => {
       rel: "stylesheet",
       href: darkStylesUrl,
       media: "(prefers-color-scheme: dark)"
-    }
+    },
+    { rel: "manifest", href: '/manifest.json' },
   ];
 };
 
