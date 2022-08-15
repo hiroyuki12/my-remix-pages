@@ -5,7 +5,7 @@ import React, { useState, useEffect } from 'react';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 dayjs.extend(relativeTime);
-import '../QiitaApp.css';
+import qiitaStyles from '../QiitaApp.css';
 
 type IndexData = {
   resources: Array<{ name: string; url: string }>;
@@ -59,6 +59,12 @@ export let meta: MetaFunction = () => {
     description: "Welcome to remix!"
   };
 };
+
+export function links() {
+  return [
+    { rel: "stylesheet", href: qiitaStyles },
+  ];
+}
 
 // https://remix.run/guides/routing#index-routes
 export default function Index() {
@@ -143,6 +149,8 @@ export default function Index() {
       <header className="QiitaApp-header">
 	<br />
         <button onClick={() => {tagButtonClick("React")}}>React</button>
+	{tag}<br />
+	{page}/{perPage}posts
 	<ul>{renderImageList(postsList)}</ul>
 	Page {page}, tag {tag}, {isLoading}
 	<br />
