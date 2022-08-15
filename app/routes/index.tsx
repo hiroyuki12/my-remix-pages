@@ -1,6 +1,11 @@
 import type { MetaFunction, LoaderFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
+import React, { useState, useEffect } from 'react';
+import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
+dayjs.extend(relativeTime);
+import '../QiitaApp.css';
 
 type IndexData = {
   resources: Array<{ name: string; url: string }>;
@@ -57,45 +62,96 @@ export let meta: MetaFunction = () => {
 
 // https://remix.run/guides/routing#index-routes
 export default function Index() {
+  const [page, setPage] = useState(1);
+  const [perPage, setPerPage] = useState(20);
+  const [postsList, setPostsList] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [tag, setTag] = useState('React');
+  const [error, setError] = useState('');
+
   let data = useLoaderData<IndexData>();
+
+  // tagが変化した時に実行
+  useEffect(() => {
+    //document.title = `page = ${page}, message = ${message}`;
+    handleClick();
+    // eslint-disable-next-line
+  }, [tag]); // Only re-run the effect if count changes
+
+  const tagButtonClick = (target) => {
+    setPerPage(20);
+    setPostsList([]);
+    setTag(target);
+    //setTag('Swift');
+  }
+
+  const handleClick = (target) => {
+    const url = `https://qiita.com/api/v2/tags/${tag}/items?page=${page}&per_page=${perPage}`;
+    setIsLoading(true);
+
+    const headers = {}
+    fetch(url, { headers })
+      .then(res =>
+        res.json().then(data => ({
+          ok: res.ok,
+          data,
+        }))
+      )
+      .then(res => {
+        if (!res.ok) {
+          setError(res.data.message);
+          setIsLoading(false);
+          //throw Error(res.data.message)
+        } else {
+          setPostsList(postsList.concat(res.data));
+          setIsLoading(false);
+        }
+      })
+  }
+
+  const renderTag = (list) => {
+    const tags = list.map((item, index) => {
+      return (
+        <>{item.name}, </>
+      );
+    });
+    return tags;
+  }
+
+  const renderImageList = (list) => {
+    const posts = list.map((item, index) => {
+      return (
+        <li className="item" key={index}>
+          <div class="card-container">
+            <img src={item.user.profile_image_url} width="54" height="54" loading="lazy" alt="img" />
+            <div class="card-text">
+              <a className="QiitaApp-link" href={item.url} target="_blank" rel="noreferrer">{item.title}</a>
+              <div class="card-text2">
+                <p>{dayjs(item.created_at).fromNow(true)}
+                   / {renderTag(item.tags)} / {item.likes_count}likes / {item.user.items_count}posts</p>
+              </div>
+            </div>
+          </div>
+        </li>
+      );
+    });
+    return posts;
+  }
 
   return (
     <div className="remix__page">
-      <main>
-        <h2>Welcome to Remix!</h2>
-        <p>We're stoked that you're here. 🥳</p>
-        <p>
-          Feel free to take a look around the code to see how Remix does things,
-          it might be a bit different than what you’re used to. When you're
-          ready to dive deeper, we've got plenty of resources to get you
-          up-and-running quickly.
-        </p>
-        <p>
-          Check out all the demos in this starter, and then just delete the{" "}
-          <code>app/routes/demos</code> and <code>app/styles/demos</code>{" "}
-          folders when you're ready to turn this into your next project.
-        </p>
-      </main>
-      <aside>
-        <h2>Demos In This App</h2>
-        <ul>
-          {data.demos.map(demo => (
-            <li key={demo.to} className="remix__page__resource">
-              <Link to={demo.to} prefetch="intent">
-                {demo.name}
-              </Link>
-            </li>
-          ))}
-        </ul>
-        <h2>Resources</h2>
-        <ul>
-          {data.resources.map(resource => (
-            <li key={resource.url} className="remix__page__resource">
-              <a href={resource.url}>{resource.name}</a>
-            </li>
-          ))}
-        </ul>
-      </aside>
+      <header className="QiitaApp-header">
+	<br />
+        <button onClick={() => {tagButtonClick("React")}}>React</button>
+	<ul>{renderImageList(postsList)}</ul>
+	Page {page}, tag {tag}, {isLoading}
+	<br />
+          {isLoading ? (
+            <>Loading .... page: {page}/{perPage}posts/{perPage*(page-1)+1}-</>
+          ) : (
+            <>Not Loading. page: {page}/{perPage}posts/{perPage*(page-1)+1}-</>
+          )}
+      </header>
     </div>
   );
 }
