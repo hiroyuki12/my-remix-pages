@@ -123,6 +123,14 @@ export default function Index() {
     //setTag('Swift');
   }
 
+  const pageButtonClick = (target) => {
+    setPerPage(100);
+    setPostsList([]);
+    const tmp = parseInt(target,10);
+    setPage(tmp);
+    //setTag('Swift');
+  }
+
   const handleClick = (target) => {
     const url = `https://qiita.com/api/v2/tags/${tag}/items?page=${page}&per_page=${perPage}`;
     setIsLoading(true);
@@ -181,7 +189,21 @@ export default function Index() {
       <header className="QiitaApp-header">
 	<br />
         <button onClick={() => {tagButtonClick("React")}}>React</button>
+        <button onClick={() => {tagButtonClick("Next.js")}}>Next.js</button>
+        <button onClick={() => {tagButtonClick("Vue.js")}}>Vue.js</button>
+        <button onClick={() => {tagButtonClick("Nuxt.js")}}>Nuxt.js</button>
+        <button onClick={() => {tagButtonClick("JavaScript")}}>JavaScript</button>
+        <button onClick={() => {tagButtonClick("Swift")}}>Swift</button>
+        <button onClick={() => {tagButtonClick("Vim")}}>Vim</button>
+        <button onClick={() => {tagButtonClick("Azure")}}>Azure</button>
+        <button onClick={() => {tagButtonClick("Aws")}}>AWS</button>
+        <button onClick={() => {tagButtonClick(".NET")}}>.NET</button>
+        <button onClick={() => {tagButtonClick("Flutter")}}>Flutter</button>
 	{tag}<br />
+	page:<button onClick={() => {pageButtonClick("1")}}>__1__</button>
+        ___:<button onClick={() => {pageButtonClick("20")}}>__20__</button>
+        ___:<button onClick={() => {pageButtonClick("50")}}>__50__</button>
+        ___:<button onClick={() => {pageButtonClick("90")}}>__90</button>
 	{page}/{perPage}posts
 	<ul>{renderImageList(postsList)}</ul>
 	Page {page}, tag {tag}, {isLoading}
@@ -192,6 +214,7 @@ export default function Index() {
             <>Not Loading. page: {page}/{perPage}posts/{perPage*(page-1)+1}-</>
           )}
       </header>
+      <div className="QiitaApp-footer">{tag} Page {page}/{perPage}posts/{perPage*(page-1)+1}-</div>
     </div>
   );
 }
