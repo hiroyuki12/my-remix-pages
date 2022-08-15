@@ -187,7 +187,11 @@ export default function Index() {
   return (
     <div className="remix__page">
       <header className="QiitaApp-header">
-	<br />
+        <font color="red"><b>{error}</b></font><br />
+        <a className="QiitaApp-link" href="https://mbp.hatenablog.com/entry/2022/08/12/095701" target="_blank" rel="noreferrer">VercelでRemix(my-remix-pages)</a><br />
+        <a className="QiitaApp-link" href="welcome" target="_blank" rel="noreferrer">Welcome</a><br />
+        <h3>QiitaでNext.jsタグありの記事を表示</h3>
+	      <br />
         <button onClick={() => {tagButtonClick("React")}}>React</button>
         <button onClick={() => {tagButtonClick("Next.js")}}>Next.js</button>
         <button onClick={() => {tagButtonClick("Vue.js")}}>Vue.js</button>
