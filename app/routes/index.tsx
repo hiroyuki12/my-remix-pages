@@ -1,12 +1,11 @@
-import type { MetaFunction, LoaderFunction } from "@remix-run/node";
-import { json } from "@remix-run/node";
-import { Link, useLoaderData } from "@remix-run/react";
+import type { MetaFunction } from "react-router";
+import { Link, useLoaderData } from "react-router";
 import React, { useState, useEffect } from 'react';
 import lodash from 'lodash';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 dayjs.extend(relativeTime);
-import qiitaStyles from '../QiitaApp.css';
+import qiitaStyles from '../QiitaApp.css?url';
 
 type IndexData = {
   resources: Array<{ name: string; url: string }>;
@@ -17,7 +16,7 @@ type IndexData = {
 // you can connect to a database or run any server side code you want right next
 // to the component that renders it.
 // https://remix.run/api/conventions#loader
-export let loader: LoaderFunction = () => {
+export const loader = () => {
   let data: IndexData = {
     resources: [
       {
@@ -50,16 +49,14 @@ export let loader: LoaderFunction = () => {
   };
 
   // https://remix.run/api/remix#json
-  return json(data);
+  return data;
 };
 
 // https://remix.run/api/conventions#meta
-export let meta: MetaFunction = () => {
-  return {
-    title: "Remix Starter",
-    description: "Welcome to remix!"
-  };
-};
+export let meta: MetaFunction = () => [
+  { title: "Remix Starter" },
+  { name: "description", content: "Welcome to remix!" },
+];
 
 export function links() {
   return [
@@ -76,7 +73,7 @@ export default function Index() {
   const [tag, setTag] = useState('React');
   const [error, setError] = useState('');
 
-  let data = useLoaderData<IndexData>();
+  let data = useLoaderData<typeof loader>();
 
   // 一番下に到達したら handleClick()でページを更新
   const handleScroll = lodash.throttle(() => {
@@ -192,6 +189,8 @@ export default function Index() {
         <a className="QiitaApp-link" href="welcome" target="_blank" rel="noreferrer">Welcome</a><br />
         <h3>QiitaでNext.jsタグありの記事を表示</h3>
 	      <br />
+        <button onClick={() => {tagButtonClick("ClaudeCode")}}>ClaudeCode</button>
+        <button onClick={() => {tagButtonClick("codex")}}>Codex</button>
         <button onClick={() => {tagButtonClick("React")}}>React</button>
         <button onClick={() => {tagButtonClick("Next.js")}}>Next.js</button>
         <button onClick={() => {tagButtonClick("Vue.js")}}>Vue.js</button>

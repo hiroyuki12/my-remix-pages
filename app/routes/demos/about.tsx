@@ -1,13 +1,11 @@
-import type { MetaFunction, LinksFunction } from "@remix-run/node";
-import { Outlet } from "@remix-run/react";
+import type { MetaFunction, LinksFunction } from "react-router";
+import { Outlet } from "react-router";
 
-import stylesUrl from "~/styles/demos/about.css";
+import stylesUrl from "~/styles/demos/about.css?url";
 
-export let meta: MetaFunction = () => {
-  return {
-    title: "About Remix"
-  };
-};
+export let meta: MetaFunction = () => [
+  { title: "About Remix" },
+];
 
 export let links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: stylesUrl }];

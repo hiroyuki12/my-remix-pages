@@ -1,17 +1,17 @@
-import type { LinksFunction, MetaFunction } from "@remix-run/node";
+import type { LinksFunction, MetaFunction } from "react-router";
 import {
+  isRouteErrorResponse,
   Link,
   Links,
-  LiveReload,
   Meta,
   Outlet,
   Scripts,
   ScrollRestoration,
-  useCatch,
-} from "@remix-run/react";
+  useRouteError,
+} from "react-router";
 
-import darkStylesUrl from "~/styles/dark.css";
-import globalStylesUrl from "~/styles/global.css";
+import darkStylesUrl from "~/styles/dark.css?url";
+import globalStylesUrl from "~/styles/global.css?url";
 
 // https://remix.run/api/conventions#links
 export let links: LinksFunction = () => {
@@ -27,10 +27,7 @@ export let links: LinksFunction = () => {
 };
 
 // https://remix.run/api/conventions#meta
-export let meta: MetaFunction = () => ({
-  charset: "utf-8",
-  viewport: "width=device-width,initial-scale=1",
-});
+export let meta: MetaFunction = () => [{ title: "Remix Starter" }];
 
 // https://remix.run/api/conventions#default-export
 // https://remix.run/api/conventions#route-filenames
@@ -44,57 +41,53 @@ export default function App() {
   );
 }
 
-// https://remix.run/api/conventions#errorboundary
-export function ErrorBoundary({ error }: { error: Error }) {
+// https://reactrouter.com/how-to/error-boundary
+export function ErrorBoundary() {
+  let error = useRouteError();
+
+  if (isRouteErrorResponse(error)) {
+    let message;
+    switch (error.status) {
+      case 401:
+        message = (
+          <p>
+            Oops! Looks like you tried to visit a page that you do not have
+            access to.
+          </p>
+        );
+        break;
+      case 404:
+        message = (
+          <p>Oops! Looks like you tried to visit a page that does not exist.</p>
+        );
+        break;
+    }
+
+    return (
+      <Document title={`${error.status} ${error.statusText}`}>
+        <Layout>
+          <h1>
+            {error.status}: {error.statusText}
+          </h1>
+          {message}
+        </Layout>
+      </Document>
+    );
+  }
+
   console.error(error);
   return (
     <Document title="Error!">
       <Layout>
         <div>
           <h1>There was an error</h1>
-          <p>{error.message}</p>
+          <p>{error instanceof Error ? error.message : "Unknown error"}</p>
           <hr />
           <p>
             Hey, developer, you should replace this with what you want your
             users to see.
           </p>
         </div>
-      </Layout>
-    </Document>
-  );
-}
-
-// https://remix.run/api/conventions#catchboundary
-export function CatchBoundary() {
-  let caught = useCatch();
-
-  let message;
-  switch (caught.status) {
-    case 401:
-      message = (
-        <p>
-          Oops! Looks like you tried to visit a page that you do not have access
-          to.
-        </p>
-      );
-      break;
-    case 404:
-      message = (
-        <p>Oops! Looks like you tried to visit a page that does not exist.</p>
-      );
-      break;
-
-    default:
-      throw new Error(caught.data || caught.statusText);
-  }
-
-  return (
-    <Document title={`${caught.status} ${caught.statusText}`}>
-      <Layout>
-        <h1>
-          {caught.status}: {caught.statusText}
-        </h1>
-        {message}
       </Layout>
     </Document>
   );
@@ -110,6 +103,8 @@ function Document({
   return (
     <html lang="en">
       <head>
+        <meta charSet="utf-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
         {title ? <title>{title}</title> : null}
         <Meta />
         <Links />
@@ -118,7 +113,6 @@ function Document({
         {children}
         <ScrollRestoration />
         <Scripts />
-        <LiveReload />
       </body>
     </html>
   );

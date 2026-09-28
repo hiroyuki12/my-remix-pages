@@ -1,16 +1,15 @@
-import type { ActionFunction } from "@remix-run/node";
-import { json, redirect } from "@remix-run/node";
-import { Form, useActionData } from "@remix-run/react";
+import type { ActionFunctionArgs } from "react-router";
+import { data, Form, redirect, useActionData } from "react-router";
 import { useEffect, useRef } from "react";
 
 export function meta() {
-  return { title: "Actions Demo" };
+  return [{ title: "Actions Demo" }];
 }
 
 // When your form sends a POST, the action is called on the server.
 // - https://remix.run/api/conventions#action
 // - https://remix.run/guides/data-updates
-export let action: ActionFunction = async ({ request }) => {
+export const action = async ({ request }: ActionFunctionArgs) => {
   let formData = await request.formData();
   let answer = formData.get("answer");
 
@@ -19,11 +18,11 @@ export let action: ActionFunction = async ({ request }) => {
   // server side.  If there's a problem, return the the data and the component
   // can render it.
   if (typeof answer !== "string") {
-    return json("Come on, at least try!", { status: 400 });
+    return data("Come on, at least try!", { status: 400 });
   }
 
   if (answer !== "egg") {
-    return json(`Sorry, ${answer} is not right.`, { status: 400 });
+    return data(`Sorry, ${answer} is not right.`, { status: 400 });
   }
 
   // Finally, if the data is valid, you'll typically write to a database or send or
@@ -35,7 +34,7 @@ export let action: ActionFunction = async ({ request }) => {
 
 export default function ActionsDemo() {
   // https://remix.run/api/remix#useactiondata
-  let actionMessage = useActionData<string>();
+  let actionMessage = useActionData<typeof action>();
   let answerRef = useRef<HTMLInputElement>(null);
 
   // This form works without JavaScript, but when we have JavaScript we can make

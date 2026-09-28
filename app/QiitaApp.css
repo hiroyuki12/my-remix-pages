@@ -14,6 +14,8 @@
 }
 
 .QiitaApp-header {
+  grid-column: 1 / -1;
+  max-width: 720px;
   background-color: #282c34;
   color: orange;
   font-size: 14px;
@@ -25,7 +27,13 @@
 
 .card-container{
   display: flex;
-  height: 38px;
+  align-items: flex-start;
+  min-height: 58px;
+  margin-bottom: 4px;
+}
+
+.card-container img{
+  flex-shrink: 0;
 }
 
 .card-text a{
